@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package common;
+
+message PaginateRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message PaginationObject {
+  int32 page = 1;
+  int32 per_page = 2;
+  int32 from = 3;
+  int32 to = 4;  
+  int32 total = 5;    
+}
+
+message Date {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+}
