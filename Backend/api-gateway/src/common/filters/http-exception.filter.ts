@@ -15,13 +15,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const response = ctx.getResponse<Response>();
 
         if (exception instanceof HttpException) {
-            response.status(exception.getStatus()).json(exception.getResponse());
+            response.status(exception.getStatus() ?? 500).json(exception.getResponse() ?? '');
         } else {
-            response.status(exception.status).json(
+            response.status(exception.status ?? 500).json(
                 {
-                    message: exception.message,
-                    statusCode: exception.status,
-                    error: HttpStatus[exception.status]
+                    message: exception.message ?? '',
+                    statusCode: exception.status ?? 500,
+                    error: HttpStatus[exception.status] ?? HttpStatus[500]
                 }
             );
         }
