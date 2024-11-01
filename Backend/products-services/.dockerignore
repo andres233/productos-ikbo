@@ -1,3 +1,4 @@
-dist
-node_modules
-.git
+dist/
+node_modules/
+.env
+.vs_code/

@@ -64,6 +64,7 @@ services:
       - ./Backend/products-services/src:/usr/src/app/src
     command: npm run start:dev
     environment:
+      - HOST=0.0.0.0
       - PORT=3001
       - DB_CONNECTION=postgres
       - DB_HOST=db_postgres
