@@ -61,17 +61,6 @@ const CreateProductForm = () => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                label="Stock"
-                                variant="outlined"
-                                type="number"
-                                fullWidth
-                                required
-                                value={stock}
-                                onChange={(e) => setStock(e.target.value)}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
                                 label="Precio"
                                 variant="outlined"
                                 type="number"

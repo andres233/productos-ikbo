@@ -19,10 +19,12 @@ import { NumericFormat } from 'react-number-format';
 import Dot from 'components/@extended/Dot';
 import { useState } from 'react';
 import { Button, CardMedia, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TablePagination, TextField } from '@mui/material';
-import ModalCreateOrder from '../orders/ModalCreateOrder';
+import ModalCreateInventary from '../inventary/ModalCreateInventary';
 import { useAuth } from 'contexts/auth/AuthContext';
 import axiosInstance from 'api/axiosInstance';
-import { LockOutlined, QuestionOutlined } from '@ant-design/icons';
+import { LockOutlined, QuestionOutlined, DeleteOutlined, AppstoreAddOutlined   } from '@ant-design/icons';
+import moment from 'moment-timezone';
+import { useNavigate } from 'react-router';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -36,6 +38,10 @@ function descendingComparator(a, b, orderBy) {
 
 function getComparator(order, orderBy) {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function formatDateTimezone(date) {
+  return (moment.utc(date).tz('America/Bogota')).subtract(5, 'hours').format('YYYY-MM-DD HH:mm:ss');
 }
 
 function stableSort(array, comparator) {
@@ -76,16 +82,16 @@ const headCells = [
     label: 'Producto'
   },
   {
-    id: 'stock',
-    align: 'right',
-    disablePadding: false,
-    label: 'Stock'
-  },
-  {
     id: 'price',
     align: 'right',
     disablePadding: false,
     label: 'PRECIO'
+  },
+  {
+    id: 'fecha creacion',
+    align: 'right',
+    disablePadding: false,
+    label: 'Fecha Creacion'
   },
   {
     id: 'actions',
@@ -120,10 +126,12 @@ function ProductsTableHead({ order, orderBy }) {
 // ==============================|| ORDER TABLE ||============================== //
 
 export default function ProductsTable({ data, pagination, onChangePage, onChangeRowsPerPage, fetchProducts }) {
+  const navigate = useNavigate();
   const { state } = useAuth();
   const [page, setPage] = useState(0); // Estado para la página
   const [rowsPerPage, setRowsPerPage] = useState(5); // Productos por página
   const [openModalOrder, setOpenModalOrder] = useState(false);
+  const [openModalConfirmDelete, setOpenModalConfirmDelete] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
 
@@ -150,6 +158,10 @@ export default function ProductsTable({ data, pagination, onChangePage, onChange
     setSelectedProduct(null);
   };
 
+  const handleRedirectInventory = (id) => {
+    navigate(`/inventary/${id}`);
+  };
+
   const createOrder = async (quantity, product) => {
     const newOrder = {
       productId: product.id,
@@ -165,6 +177,27 @@ export default function ProductsTable({ data, pagination, onChangePage, onChange
     }
   };
 
+  const handleOpenConfirmDelete = (product) => {
+    setSelectedProduct(product);
+    setOpenModalConfirmDelete(true);
+  };
+
+  const handleCloseConfirmDelete = () => {
+    setOpenModalConfirmDelete(false);
+    setSelectedProduct(null);
+  };
+
+  const handleDeleteProduct = async () => {
+    try {
+      await axiosInstance.delete(`/api/product/${selectedProduct.id}`);
+      fetchProducts(page + 1, rowsPerPage);
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+    handleCloseConfirmDelete(); // Cerrar el modal después de eliminar
+  };
+
+
   var products = [];
 
   if (data) {
@@ -172,7 +205,7 @@ export default function ProductsTable({ data, pagination, onChangePage, onChange
   }
 
 
-  const order = 'asc';
+  const order = 'desc';
   const orderBy = 'id';
 
   return (
@@ -209,16 +242,17 @@ export default function ProductsTable({ data, pagination, onChangePage, onChange
                   </TableCell>
                   <TableCell>{row.sku}</TableCell>
                   <TableCell>{row.name}</TableCell>
-                  <TableCell align="right">{row.stock}</TableCell>
                   <TableCell align="right">
                     <NumericFormat value={row.price} displayType="text" thousandSeparator prefix="$" />
                   </TableCell>
-                  <TableCell align="right">
-                    {row.stock > 0 ?
-                      <Button variant="contained" color="success" onClick={() => handleOpenModal(row)}>
-                        Comprar
-                      </Button> : <Chip icon={<LockOutlined />} label="sin stock" />
-                    }
+                  <TableCell align="right">{formatDateTimezone(row.createdAt)}</TableCell>
+                  <TableCell align="center">
+                    <Button variant="contained" color="success" onClick={() => handleRedirectInventory(row.id)}>
+                      <AppstoreAddOutlined  />Inventario
+                    </Button>
+                    <Button variant="contained" color="error" onClick={() => handleOpenConfirmDelete(row)}>
+                      <DeleteOutlined  />Eliminar
+                    </Button>
                   </TableCell>
                 </TableRow>
               );
@@ -236,7 +270,25 @@ export default function ProductsTable({ data, pagination, onChangePage, onChange
         onRowsPerPageChange={handleChangeRowsPerPage} // Cambiar filas por página
         labelRowsPerPage="Filas por página"
       />
+
+      <Dialog
+        open={openModalConfirmDelete}
+        onClose={handleCloseConfirmDelete}
+      >
+        <DialogTitle>Confirmar Eliminación</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            ¿Estás seguro de que deseas eliminar el producto {selectedProduct?.name}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDelete}>Cancelar</Button>
+          <Button onClick={handleDeleteProduct} color="error">Eliminar</Button>
+        </DialogActions>
+      </Dialog>
+
       {selectedProduct ?
+
         <Dialog
           open={openModalOrder}
           onClose={handleCloseModal}

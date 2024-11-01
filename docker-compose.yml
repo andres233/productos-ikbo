@@ -57,11 +57,11 @@ services:
   #     - db_postgres
 
   product-services:
-    build: ./Backend/inventory-services
+    build: ./Backend/products-services
     ports:
       - "3001:3001"
     volumes:
-      - ./Backend/inventory-services/src:/usr/src/app/src
+      - ./Backend/products-services/src:/usr/src/app/src
     command: npm run start:dev
     environment:
       - PORT=3001

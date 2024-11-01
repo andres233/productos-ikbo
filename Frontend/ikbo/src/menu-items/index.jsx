@@ -10,7 +10,8 @@ import orders from './orders';
 
 const menuItems = {
   // items: [dashboard, pages, utilities, support]
-  items: [products, orders]
+  // items: [products, orders
+  items: [products]
 };
 
 export default menuItems;

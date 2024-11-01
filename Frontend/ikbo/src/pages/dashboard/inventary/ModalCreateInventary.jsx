@@ -7,7 +7,7 @@ const ModalCreateOrder = ({ open, handleClose, product, onConfirm }) => {
   const [quantity, setQuantity] = useState(1);
 
   const handleQuantityChange = (e) => {
-    const value = Math.min(e.target.value, product.stock); // Asegúrate de no exceder el stock
+    const value = Math.min(e.target.value, product.stock); 
     setQuantity(value);
   };
 
@@ -25,7 +25,12 @@ const ModalCreateOrder = ({ open, handleClose, product, onConfirm }) => {
           label="Cantidad"
           value={quantity}
           onChange={handleQuantityChange}
-          inputProps={{ min: 1, max: product.stock }} // Limitar el rango
+          inputProps={{ min: 1, max: product.stock }} 
+        />
+        <TextField
+          type="date"
+          label="Fecha"
+        //   value={quantity}
         />
         <Button onClick={handleConfirm}>Aceptar</Button>
         <Button onClick={handleClose}>Cancelar</Button>

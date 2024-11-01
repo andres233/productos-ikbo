@@ -7,7 +7,7 @@ import { ProtectedRoute } from './ProtectedRoutes';
 import ListProducts from 'pages/dashboard/products/ListProducts';
 import { Navigate } from 'react-router';
 import CreateProductForm from 'pages/dashboard/products/CreateProductForm';
-import ListOrders from 'pages/dashboard/orders/ListOrders';
+import ListInventaries from 'pages/dashboard/inventary/ListInventaries';
 
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
 const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
@@ -41,8 +41,8 @@ const MainRoutes = {
       element: <CreateProductForm />
     },
     {
-      path: 'orders',
-      element: <ListOrders />
+      path: 'inventary/:productId',
+      element: <ListInventaries />
     }
   ]
 };

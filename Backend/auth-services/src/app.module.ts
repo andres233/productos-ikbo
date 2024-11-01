@@ -16,6 +16,7 @@ import { envs } from 'src/config';
       password: envs.db_password,
       entities: ['dist/**/*.entity.{ts,js}'],
       synchronize: true, // never true in production!
+      timezone: 'America/Bogota',
     }),
     AuthModule,
   ],
